@@ -1,50 +1,31 @@
-var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+var width = window.innerWidth;
+var height = window.innerHeight;
 
-var width = 960,
-    height = 500;
+var numEnemies = 30;
 
-var svg = d3.select("body")
-  .append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(32," + (height / 2) + ")");
+var dataset = [];
+var x;
+var y;
 
-function update(data) {
-
-  // DATA JOIN
-  // Join new data with old elements, if any.
-  var text = svg.selectAll("text")
-    .data(data, function(d) { return d; });
-
-  // UPDATE
-  // Update old elements as needed.
-  text.attr("class", "update");
-
-  // ENTER
-  // Create new elements as needed.
-  text.enter().append("text")
-    .attr("class", "enter")
-    .attr("dy", ".35em")
-    .text(function(d) { return d; });
-
-  // ENTER + UPDATE
-  // Appending to the enter selection expands the update selection to include
-  // entering elements; so, operations on the update selection after appending to
-  // the enter selection will apply to both entering and updating nodes.
-  text.attr("x", function(d, i) { return i * 60; })
-
-  // EXIT
-  // Remove old elements as needed.
-  text.exit().remove();
+for (var i = 0; i < numEnemies; i++) {
+  x = Math.floor(Math.random() * width);
+  y = Math.floor(Math.random() * height);
+  dataset.push([x,y]);
 }
 
-// The initial display.
-update(alphabet);
+var svg = d3.select('body')
+  .append('svg')
+    .attr({'width': width, 'height': height});
 
-// Grab a random sample of letters from the alphabet, in alphabetical order.
-setInterval(function() {
-  update(d3.shuffle(alphabet)
-    .slice(0, Math.floor(Math.random() * 26))
-    .sort());
-}, 1500);
+var enemies = svg.append('g').attr('class', 'enemies')
+  .selectAll('circle')
+  .data(dataset, function(d) { return d; })
+  .enter().append('circle');
+
+enemies.attr({
+  'class' : 'enemy',
+  'r'     : Math.floor(width / 50),
+  'cx'    : function(d) { return d[0]; },
+  'cy'    : function(d) { return d[1]; },
+  'fill'  : 'coral'
+});
