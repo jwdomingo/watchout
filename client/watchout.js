@@ -1,9 +1,11 @@
 var width = window.innerWidth;
 var height = window.innerHeight;
+var color = d3.scale.category20c()
 
 var svg = d3.select('body')
-    .append('svg').attr({'width': width, 'height': height})
-    .append('g').attr('class', 'enemies');
+  .append('svg').attr({'width': width, 'height': height});
+
+var enemies = svg.append('g').attr('class', 'enemies');
 
 var createEnemies = function(numEnemies) {
   var result = [];
@@ -19,25 +21,28 @@ var createEnemies = function(numEnemies) {
 };
 
 var update = function(data) {
-  var enemies = svg.selectAll('circle')
-    .data(data, function(d) { return d; });
+  var enemySelection = enemies.selectAll('circle')
+    .data(data);
 
-  enemies.transition().duration(1000);
+  enemySelection.enter()
+    .append('circle').attr({
+      'class' : 'enemy',
+      'r'     : Math.floor(width / 50),
+      'fill'  : color
+    });
 
-  enemies.enter().append('circle');
-
-  enemies.attr({
-    'class' : 'enemy',
-    'r'     : Math.floor(width / 40),
-    'cx'    : function(d) { return d[0]; },
-    'cy'    : function(d) { return d[1]; },
-    'fill'  : 'coral'
+  enemySelection.transition().duration(1000).attr({
+    'cx' : function(d) { return d[0]; },
+    'cy' : function(d) { return d[1]; }
   });
-  
-  enemies.exit().remove();
+
+  enemySelection.exit().remove();
 };
 
+var dataset = createEnemies(15);
+update(dataset);
+
 setInterval(function() {
-  var dataset = createEnemies(30);
+  dataset = createEnemies(15);
   update(dataset);
-}, 1500);
+}, 2500);
