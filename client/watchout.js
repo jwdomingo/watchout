@@ -1,31 +1,41 @@
 var width = window.innerWidth;
 var height = window.innerHeight;
 
-var numEnemies = 30;
-
-var dataset = [];
-var x;
-var y;
-
-for (var i = 0; i < numEnemies; i++) {
-  x = Math.floor(Math.random() * width);
-  y = Math.floor(Math.random() * height);
-  dataset.push([x,y]);
-}
-
 var svg = d3.select('body')
-  .append('svg')
-    .attr({'width': width, 'height': height});
+    .append('svg').attr({'width': width, 'height': height})
+    .append('g').attr('class', 'enemies');
 
-var enemies = svg.append('g').attr('class', 'enemies')
-  .selectAll('circle')
-  .data(dataset, function(d) { return d; })
-  .enter().append('circle');
+var createEnemies = function(numEnemies) {
+  var result = [];
+  var x;
+  var y;
 
-enemies.attr({
-  'class' : 'enemy',
-  'r'     : Math.floor(width / 50),
-  'cx'    : function(d) { return d[0]; },
-  'cy'    : function(d) { return d[1]; },
-  'fill'  : 'coral'
-});
+  for (var i = 0; i < numEnemies; i++) {
+    x = Math.floor(Math.random() * width);
+    y = Math.floor(Math.random() * height);
+    result.push([x,y]);
+  }
+  return result;
+};
+
+var update = function(data) {
+  var enemies = svg.selectAll('circle')
+    .data(data, function(d) { return d; });
+
+  enemies.enter().append('circle');
+
+  enemies.attr({
+    'class' : 'enemy',
+    'r'     : Math.floor(width / 50),
+    'cx'    : function(d) { return d[0]; },
+    'cy'    : function(d) { return d[1]; },
+    'fill'  : 'coral'
+  });
+  
+  enemies.exit().remove();
+};
+
+setInterval(function() {
+  var dataset = createEnemies(30);
+  update(dataset);
+}, 1500);
