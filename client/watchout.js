@@ -22,11 +22,13 @@ var update = function(data) {
   var enemies = svg.selectAll('circle')
     .data(data, function(d) { return d; });
 
+  enemies.transition().duration(1000);
+
   enemies.enter().append('circle');
 
   enemies.attr({
     'class' : 'enemy',
-    'r'     : Math.floor(width / 50),
+    'r'     : Math.floor(width / 40),
     'cx'    : function(d) { return d[0]; },
     'cy'    : function(d) { return d[1]; },
     'fill'  : 'coral'
