@@ -1,11 +1,3 @@
-.update {
-  fill: lightcoral;
-}
-
-.enter {
-  fill: cornflowerblue;
-}
-
-text {
-  font: bold 75px monospace;
+body {
+  margin: 0;
 }
