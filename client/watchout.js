@@ -50,8 +50,14 @@ var newPlayer = new Player();
 
 var start = (width * 0.5) + ',' + (height * 0.5);
 
-svg.append('path').attr('d', newPlayer.path)
-  .attr({'transform': 'translate(' + start + ') scale(2)'});
+svg.append('path').attr({
+  'd': newPlayer.path,
+  'fill' : '#111',
+  'stroke' : 'coral',
+  'stroke-width' : '5',
+  'stroke-opacity' : '0.8',
+  'transform' : 'translate(' + start + ') scale(2)'
+});
 
 setInterval(function() {
   dataset = createEnemies(15);
