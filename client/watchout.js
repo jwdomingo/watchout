@@ -51,7 +51,8 @@ var newPlayer = new Player();
 var start = (width * 0.5) + ',' + (height * 0.5);
 
 svg.append('path').attr({
-  'd': newPlayer.path,
+  'id' : 'player',
+  'd' : newPlayer.path,
   'fill' : '#111',
   'stroke' : 'coral',
   'stroke-width' : '5',
@@ -63,3 +64,19 @@ setInterval(function() {
   dataset = createEnemies(15);
   update(dataset);
 }, 2500);
+
+var drag = d3.behavior.drag();
+var myPlayer = d3.select('#player');
+
+myPlayer.call(drag);
+
+myPlayer.on('click', function() {});
+
+drag.on('drag', function() {
+  var e = window.event;
+  var x = e.clientX;
+  var y = e.clientY;
+
+  myPlayer.attr('transform', 'translate(' + x + ',' + y + ') scale(2)');
+});
+
