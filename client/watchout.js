@@ -31,7 +31,7 @@ var update = function(data) {
       'fill'  : function(d,i) { return color(i); }
     });
 
-  enemySelection.transition().duration(2000)
+  enemySelection.transition().duration(2500)
     .tween('custom', detectCollision)
     .attr({
       'cx' : function(d) { return d.x; },
@@ -68,7 +68,7 @@ svg.append('path').attr({
 setInterval(function() {
   dataset = createEnemies(15);
   update(dataset);
-}, 5000);
+}, 2500);
 
 var drag = d3.behavior.drag();
 var myPlayer = d3.select('#player');
@@ -86,7 +86,23 @@ d3.select('body').on('keydown', function(event) {
   // B     : 66
 
   if (key === 32 || (key >= 37 && key <= 40) || key === 65 || key === 66) {
+    console.log('--------------->',newPlayer.angle);
+    console.log('x:', newPlayer.x);
+    console.log('y:', newPlayer.y);
+    console.log('xNew:',Math.cos(newPlayer.angle));
+    console.log('yOld:',Math.sin(newPlayer.angle));
 
+    svg.append('circle').attr({
+      'class' : 'laser',
+      'r'     : 2,
+      'fill'  : 'black',
+      'cx'    : newPlayer.x,
+      'cy'    : newPlayer.y
+    })
+    .transition().attr({
+      'cx'    : newPlayer.x + (Math.cos(newPlayer.angle) * 200),
+      'cy'    : newPlayer.y + (Math.sin(newPlayer.angle) * 200)
+    });
   }
 });
 
@@ -94,15 +110,13 @@ drag.on('drag', function() {
   var e = window.event;
   var x = e.clientX;
   var y = e.clientY;
-  var a = newPlayer.angle;
-  var radians = Math.atan2(x - (x + 18), y - (y + 18));
+  var radians = Math.atan2(d3.event.dx, d3.event.dy);
   var degree = (radians * (180 / Math.PI) * -1) + 90;
-  degree = 0;
 
   newPlayer.x = x;
   newPlayer.y = y;
-  myPlayer.attr('transform', 'translate(' + x + ',' + y + ') scale(2) rotate(' + degree + ')');
-  enemies.selectAll('circle').attr('custom', detectCollision);
+  newPlayer.angle = degree;
+  myPlayer.attr('transform', 'translate(' + x + ',' + y + ') scale(2) rotate(' + degree + ')').transition();
 });
 
 var checkCollision = function(enemy) {
