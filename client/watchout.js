@@ -70,7 +70,20 @@ var myPlayer = d3.select('#player');
 
 myPlayer.call(drag);
 
-myPlayer.on('click', function() {});
+d3.select('body').on('keydown', function(event) {
+  var key = d3.event.keyCode;
+  // SPACE : 32
+  // LEFT  : 37
+  // UP    : 38
+  // RIGHT : 39
+  // DOWN  : 40
+  // A     : 65
+  // B     : 66
+
+  if (key === 32 || (key >= 37 && key <= 40) || key === 65 || key === 66) {
+    console.log('HIT!');
+  }
+});
 
 drag.on('drag', function() {
   var e = window.event;
