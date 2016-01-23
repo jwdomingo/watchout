@@ -15,7 +15,7 @@ var createEnemies = function(numEnemies) {
   for (var i = 0; i < numEnemies; i++) {
     x = Math.floor(Math.random() * width);
     y = Math.floor(Math.random() * height);
-    result.push([x,y]);
+    result.push({x: x, y: y});
   }
   return result;
 };
@@ -28,18 +28,23 @@ var update = function(data) {
     .append('circle').attr({
       'class' : 'enemy',
       'r'     : Math.floor(width / 50),
-      'fill'  : color
+      'fill'  : function(d,i) { return color(i); }
     });
 
-  enemySelection.transition().duration(1000).attr({
-    'cx' : function(d) { return d[0]; },
-    'cy' : function(d) { return d[1]; }
-  });
+  enemySelection.transition().duration(2000)
+    .tween('custom', detectCollision)
+    .attr({
+      'cx' : function(d) { return d.x; },
+      'cy' : function(d) { return d.y; }
+    });
 
   enemySelection.exit().remove();
 };
 
 var Player = function() {
+  this.r = 5;
+  this.x = width * 0.5;
+  this.y = height * 0.5;
   this.angle = 0;
 };
 
@@ -50,8 +55,6 @@ update(dataset);
 
 var newPlayer = new Player();
 
-var start = (width * 0.5) + ',' + (height * 0.5);
-
 svg.append('path').attr({
   'id' : 'player',
   'd' : newPlayer.path,
@@ -59,13 +62,13 @@ svg.append('path').attr({
   'stroke' : 'coral',
   'stroke-width' : '5',
   'stroke-opacity' : '0.8',
-  'transform' : 'translate(' + start + ') scale(2)'
+  'transform' : 'translate(' + newPlayer.x + ',' + newPlayer.y + ') scale(2)'
 });
 
 setInterval(function() {
   dataset = createEnemies(15);
   update(dataset);
-}, 2500);
+}, 5000);
 
 var drag = d3.behavior.drag();
 var myPlayer = d3.select('#player');
@@ -96,6 +99,44 @@ drag.on('drag', function() {
   var degree = (radians * (180 / Math.PI) * -1) + 90;
   degree = 0;
 
+  newPlayer.x = x;
+  newPlayer.y = y;
   myPlayer.attr('transform', 'translate(' + x + ',' + y + ') scale(2) rotate(' + degree + ')');
+  enemies.selectAll('circle').attr('custom', detectCollision);
 });
 
+var checkCollision = function(enemy) {
+  return enemy.each(function() {
+    var radiusSum = parseFloat(enemy.attr('r')) + newPlayer.r;
+    var xDiff = parseFloat(enemy.attr('cx')) - newPlayer.x;
+    var yDiff = parseFloat(enemy.attr('cy')) - newPlayer.y;
+    var separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+    if (separation < radiusSum) {
+      console.log('AHHH!');
+    }
+  });
+};
+
+var detectCollision = function(d) {
+  var enemy = d3.select(this);
+
+  var startPos = {
+    x: parseFloat(enemy.attr('cx')),
+    y: parseFloat(enemy.attr('cy'))
+  };
+
+  var endPos = {
+    x: d.x,
+    y: d.y
+  };
+  
+  return function(t) {
+    var enemyNextPos;
+    checkCollision(enemy);
+    enemyNextPos = {
+      x: startPos.x + (endPos.x - startPos.x) * t,
+      y: startPos.y + (endPos.y - startPos.y) * t
+    };
+    return enemy.attr('cx', enemyNextPos.x).attr('cy', enemyNextPos.y);
+  };
+};
