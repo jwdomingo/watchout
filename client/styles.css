@@ -1,3 +1,16 @@
 body {
   margin: 0;
+  /*background-color: #222;*/
+}
+
+path.lights {
+  stroke: white;
+  stroke-width: 0;
+  /*animation: flash 2s ease infinite forwards;*/
+}
+
+@keyframes flash {
+  100% {
+    stroke-width: 4;
+  }
 }
